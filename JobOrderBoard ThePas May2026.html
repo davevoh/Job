@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Order Board – The Pas Region | May 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
+
+  :root {
+    --navy: #162040;
+    --navy-mid: #1e2d57;
+    --gold: #c8890a;
+    --gold-light: #f0a820;
+    --bg: #f4f6fa;
+    --white: #ffffff;
+    --border: #d0d8e8;
+    --text: #1a1f2e;
+    --muted: #6b7a99;
+    --green: #1a7a4a;
+    --red: #b03030;
+    --amber: #b06010;
+    --tag-perm: #e8f5ee;
+    --tag-perm-t: #1a6640;
+    --tag-term: #e8f0ff;
+    --tag-term-t: #1e3a8a;
+    --tag-cas: #fdf3e0;
+    --tag-cas-t: #8a5000;
+    --tag-ft: #f0f4ff;
+    --tag-ft-t: #2a4090;
+    --tag-pt: #fdf0f8;
+    --tag-pt-t: #8a106a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* HEADER */
+  .site-header {
+    background: var(--navy);
+    color: var(--white);
+    padding: 28px 32px 20px;
+    border-bottom: 4px solid var(--gold);
+  }
+  .site-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+  }
+  .site-header .subtitle {
+    font-size: 13px;
+    color: #a8b8d8;
+    font-weight: 300;
+  }
+  .site-header .subtitle span {
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+
+  /* LEGEND */
+  .legend-bar {
+    background: var(--navy-mid);
+    color: #c0cce8;
+    font-size: 11.5px;
+    padding: 8px 32px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+  .legend-bar b { color: var(--gold-light); }
+
+  /* CONTROLS */
+  .controls {
+    background: var(--white);
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .controls input[type="text"] {
+    flex: 1;
+    min-width: 200px;
+    padding: 8px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .controls input[type="text"]:focus { border-color: var(--navy); }
+  .controls select {
+    padding: 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    cursor: pointer;
+  }
+  .controls .count-badge {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .controls .count-badge span {
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .btn-reset {
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-reset:hover { border-color: var(--navy); color: var(--navy); }
+
+  /* TABLE WRAPPER */
+  .table-wrap {
+    padding: 20px 32px 40px;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(22,32,64,0.08);
+  }
+
+  thead th {
+    background: var(--navy);
+    color: var(--white);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding: 11px 14px;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+  thead th:hover { background: var(--navy-mid); }
+  thead th.sort-asc::after { content: ' ▲'; font-size: 9px; }
+  thead th.sort-desc::after { content: ' ▼'; font-size: 9px; }
+
+  tbody tr {
+    border-bottom: 1px solid #edf0f7;
+    transition: background 0.12s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f0f4fb; }
+  tbody tr.expired { opacity: 0.55; }
+
+  td {
+    padding: 10px 14px;
+    vertical-align: middle;
+    font-size: 13px;
+  }
+
+  td.company {
+    font-weight: 600;
+    color: var(--navy);
+    min-width: 170px;
+    max-width: 200px;
+  }
+  td.position {
+    min-width: 200px;
+    max-width: 240px;
+    font-weight: 500;
+  }
+  td.location { white-space: nowrap; }
+  td.dates { white-space: nowrap; font-size: 12px; color: var(--muted); }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    line-height: 1.6;
+  }
+  .tag-perm { background: var(--tag-perm); color: var(--tag-perm-t); }
+  .tag-term { background: var(--tag-term); color: var(--tag-term-t); }
+  .tag-casual { background: var(--tag-cas); color: var(--tag-cas-t); }
+  .tag-ft { background: var(--tag-ft); color: var(--tag-ft-t); }
+  .tag-pt { background: var(--tag-pt); color: var(--tag-pt-t); }
+  .tag-ftpt { background: #f5f0ff; color: #5a1e90; }
+  .tag-ouf { background: #e8f5ee; color: #1a6640; }
+  .tag-exp { background: #fde8e8; color: #a01010; }
+
+  /* Link button */
+  .apply-btn {
+    display: inline-block;
+    background: var(--navy);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 5px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .apply-btn:hover { background: var(--gold); }
+  .apply-btn.no-link {
+    background: #c0c8da;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .contact-cell { font-size: 12px; color: var(--muted); }
+  .contact-cell a { color: var(--navy); text-decoration: none; }
+  .contact-cell a:hover { text-decoration: underline; }
+
+  /* No results */
+  .no-results {
+    text-align: center;
+    padding: 48px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  /* Section dividers */
+  tr.section-header td {
+    background: var(--bg);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Footer */
+  .site-footer {
+    background: var(--navy);
+    color: #7888aa;
+    font-size: 12px;
+    padding: 18px 32px;
+    text-align: center;
+  }
+  .site-footer strong { color: #a8b8d8; }
+
+  @media (max-width: 768px) {
+    .site-header, .legend-bar, .controls, .table-wrap { padding-left: 16px; padding-right: 16px; }
+    td.company, td.position { min-width: 130px; max-width: 160px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>Job Order Board &mdash; The Pas Region</h1>
+  <div class="subtitle">Manitoba Employment &amp; Skills Development Centre &nbsp;|&nbsp; <span>May 2026</span> &nbsp;|&nbsp; Business, Mining, Trade and Job Creation</div>
+</header>
+
+<div class="legend-bar">
+  <span><b>NCD</b> = No Closing Date</span>
+  <span><b>NOD</b> = No Opening Date</span>
+  <span><b>OUF</b> = Open Until Filled</span>
+  <span><b>FT</b> = Full-time</span>
+  <span><b>PT</b> = Part-time</span>
+  <span><b>FT/PT</b> = Full or Part-time</span>
+  <span style="color:#f0a860"><b>Expired</b> = Closing date has passed</span>
+</div>
+
+<div class="controls">
+  <input type="text" id="searchInput" placeholder="Search by company, position, or keyword..." oninput="applyFilters()">
+  <select id="filterLocation" onchange="applyFilters()">
+    <option value="">All Locations</option>
+    <option value="The Pas">The Pas</option>
+    <option value="Opaskwayak">Opaskwayak</option>
+  </select>
+  <select id="filterType" onchange="applyFilters()">
+    <option value="">All Employment Types</option>
+    <option value="Full-time">Full-time</option>
+    <option value="Part-time">Part-time</option>
+    <option value="FT/PT">FT/PT</option>
+  </select>
+  <select id="filterCondition" onchange="applyFilters()">
+    <option value="">All Conditions</option>
+    <option value="Permanent">Permanent</option>
+    <option value="Term">Term</option>
+    <option value="Casual">Casual</option>
+    <option value="Fixed-term">Fixed-term</option>
+  </select>
+  <select id="filterStatus" onchange="applyFilters()">
+    <option value="">All Statuses</option>
+    <option value="open">Still Open</option>
+    <option value="expired">Expired / Check Status</option>
+  </select>
+  <button class="btn-reset" onclick="resetFilters()">Reset</button>
+  <span class="count-badge">Showing <span id="visibleCount">0</span> of <span id="totalCount">0</span> listings</span>
+</div>
+
+<div class="table-wrap">
+<table id="jobTable">
+  <thead>
+    <tr>
+      <th onclick="sortTable(0)">Company</th>
+      <th onclick="sortTable(1)">Position</th>
+      <th onclick="sortTable(2)">Location</th>
+      <th onclick="sortTable(3)">Type</th>
+      <th onclick="sortTable(4)">Condition</th>
+      <th onclick="sortTable(5)">Opening</th>
+      <th onclick="sortTable(6)">Closing</th>
+      <th>Contact</th>
+      <th>Apply / Info</th>
+    </tr>
+  </thead>
+  <tbody id="jobBody"></tbody>
+</table>
+<div class="no-results" id="noResults" style="display:none;">No listings match your search. Try adjusting your filters.</div>
+</div>
+
+<footer class="site-footer">
+  <strong>Job Order Board – The Pas Region | May 2026</strong> &nbsp;&bull;&nbsp;
+  Manitoba Employment &amp; Skills Development Centre &nbsp;&bull;&nbsp;
+  Always verify listings directly with the employer. Links open in a new tab.
+</footer>
+
+<script>
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+// closingDate: use "OUF" for Open Until Filled, "" for not listed, or "YYYY-MM-DD"
+// expired: true if closing date is before 2026-05-20
+// link: full URL or "" if not available
+
+const jobs = [
+
+  // BAKER TILLY CANADA
+  { company:"Baker Tilly Canada", position:"Accounting Technician / CPA Student", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"", opening:"", closing:"", contact:"", email:"", link:"https://ca.indeed.com/viewjob?jk=dc3ca5e3b6e098aa&tk=1jnq5uo72gkvb801&from=serp&vjs=3", expired:false },
+
+  // BEATRICE WILSON HEALTH CENTRE
+  { company:"Beatrice Wilson Health Centre", position:"Event Planner", location:"Opaskwayak", type:"Full-time", condition:"Permanent", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr@ocnhealth.com", link:"https://www.beatricewilsonhealthcentre.ca/wcm-docs/jobs/otf_event_planner_nov_2025__20260210141818.pdf", expired:false },
+  { company:"Beatrice Wilson Health Centre", position:"NNADAP Worker", location:"Opaskwayak", type:"", condition:"", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr@ocnhealth.com", link:"https://www.beatricewilsonhealthcentre.ca/wcm-docs/jobs/otf_nnadap_worker_2025_20250917154328.pdf", expired:false },
+  { company:"Beatrice Wilson Health Centre", position:"Birth Doula / Birth Helper", location:"Opaskwayak", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"hr@ocnhealth.com", link:"https://www.beatricewilsonhealthcentre.ca/wcm-docs/jobs/birth_doula_external_posting_otf_20250430151552.pdf", expired:false },
+  { company:"Beatrice Wilson Health Centre", position:"Janitory (Casual)", location:"Opaskwayak", type:"Part-time", condition:"", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr@ocnhealth.com", link:"https://www.beatricewilsonhealthcentre.ca/wcm-docs/jobs/casual_janitor_feb_2025_20250430151830.pdf", expired:false },
+  { company:"Beatrice Wilson Health Centre", position:"Midwife", location:"Opaskwayak", type:"", condition:"", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr@ocnhealth.com", link:"https://www.beatricewilsonhealthcentre.ca/wcm-docs/jobs/midwife_x2_ext_2024_20250430151928.pdf", expired:false },
+  { company:"Beatrice Wilson Health Centre", position:"Casual Receptionist", location:"Opaskwayak", type:"Part-time", condition:"Casual", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr@ocnhealth.com", link:"https://www.beatricewilsonhealthcentre.ca/wcm-docs/jobs/otf_july_2024_20250430152024.pdf", expired:false },
+  { company:"Beatrice Wilson Health Centre", position:"Security Guard", location:"Opaskwayak", type:"Part-time", condition:"Casual", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr@ocnhealth.com", link:"https://www.beatricewilsonhealthcentre.ca/wcm-docs/jobs/security_casual_2024_otf_20250430152038.pdf", expired:false },
+  { company:"Beatrice Wilson Health Centre", position:"Dispatcher", location:"Opaskwayak", type:"Full-time", condition:"", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr@ocnhealth.com", link:"https://www.beatricewilsonhealthcentre.ca/wcm-docs/jobs/otf_nihb_dispatcher_march_2026_20260415093429.pdf", expired:false },
+  { company:"Beatrice Wilson Health Centre", position:"Case Worker – On-Reserve", location:"Opaskwayak", type:"", condition:"", workMode:"In Person", opening:"", closing:"May 6", contact:"", email:"hr@ocnhealth.com", link:"https://www.beatricewilsonhealthcentre.ca/wcm-docs/jobs/ext_case_worker_on_reserve_april_2026_20260420103620.pdf", expired:true },
+  { company:"Beatrice Wilson Health Centre", position:"Behavioral Health Clinician", location:"Opaskwayak", type:"", condition:"", workMode:"In Person", opening:"", closing:"May 6", contact:"", email:"hr@ocnhealth.com", link:"https://www.beatricewilsonhealthcentre.ca/wcm-docs/jobs/ext_bhc_jpcfi_may_2026_20260423173927.pdf", expired:true },
+
+  // CANA CABANA
+  { company:"Cana Cabana", position:"Retail Shift Leader", location:"Opaskwayak", type:"Part-time", condition:"Permanent", workMode:"In Person", opening:"", closing:"", contact:"", email:"", link:"https://ca.indeed.com/jobs?q=Retail+Shift+Leader+Cana+Cabana&l=Opaskwayak%2C+MB", expired:false },
+
+  // CANADIAN KRAFT PAPER
+  { company:"Canadian Kraft Paper", position:"Electrician / 4th Year Apprentice", location:"The Pas", type:"Full-time", condition:"", workMode:"In Person", opening:"", closing:"Jun 30", contact:"", email:"", link:"https://curos.ca/w6.20.01/la/CKPI2207/V/TRBJO_PUBLIC?requisition_number=62&view=detail&lang=en", expired:false },
+  { company:"Canadian Kraft Paper", position:"Pipefitter / 4th Year Apprentice", location:"The Pas", type:"Full-time", condition:"", workMode:"In Person", opening:"", closing:"May 31", contact:"", email:"", link:"https://curos.ca/w6.20.01/la/CKPI2207/V/TRBJO_PUBLIC?requisition_number=78&view=detail&lang=en", expired:false },
+  { company:"Canadian Kraft Paper", position:"Maintenance Superintendent", location:"The Pas", type:"Full-time", condition:"", workMode:"In Person", opening:"", closing:"Mar 14", contact:"", email:"", link:"https://curos.ca/w6.20.01/la/CKPI2207/V/TRBJO_PUBLIC?requisition_number=95&view=detail&lang=en", expired:true },
+  { company:"Canadian Kraft Paper", position:"Millwright / 4th Year Apprentice", location:"The Pas", type:"Full-time", condition:"", workMode:"In Person", opening:"", closing:"Jun 30", contact:"", email:"", link:"https://curos.ca/w6.20.01/la/CKPI2207/V/TRBJO_PUBLIC?requisition_number=106&view=detail&lang=en", expired:false },
+  { company:"Canadian Kraft Paper", position:"HR Administrative Assistant", location:"The Pas", type:"Full-time", condition:"", workMode:"In Person", opening:"", closing:"Aug 1", contact:"", email:"", link:"https://curos.ca/w6.20.01/la/CKPI2207/V/TRBJO_PUBLIC?requisition_number=107&view=detail&lang=en", expired:false },
+  { company:"Canadian Kraft Paper", position:"Forestry Assistant – Summer Student", location:"The Pas", type:"Full-time", condition:"Term", workMode:"In Person", opening:"", closing:"", contact:"", email:"", link:"https://curos.ca/w6.20.01/la/CKPI2207/V/TRBJO_PUBLIC?requisition_number=110&view=detail&lang=en", expired:false },
+  { company:"Canadian Kraft Paper", position:"Asset Integrity Engineer", location:"The Pas", type:"Full-time", condition:"", workMode:"In Person", opening:"", closing:"", contact:"", email:"", link:"https://curos.ca/w6.20.01/la/CKPI2207/V/TRBJO_PUBLIC?requisition_number=111&view=detail&lang=en", expired:false },
+  { company:"Canadian Kraft Paper", position:"Yard Scaler", location:"The Pas", type:"Full-time", condition:"", workMode:"In Person", opening:"", closing:"Jul 1", contact:"", email:"", link:"https://curos.ca/w6.20.01/la/CKPI2207/V/TRBJO_PUBLIC?requisition_number=122&view=detail&lang=en", expired:false },
+  { company:"Canadian Kraft Paper", position:"Human Resources Team Lead", location:"The Pas", type:"Full-time", condition:"", workMode:"In Person", opening:"", closing:"", contact:"", email:"", link:"https://curos.ca/w6.20.01/la/CKPI2207/V/TRBJO_PUBLIC?requisition_number=129&view=detail&lang=en", expired:false },
+
+  // CANADA POST
+  { company:"Canada Post", position:"Postal Clerk – Retail Counter Clerk", location:"The Pas", type:"Full-time", condition:"Term", workMode:"", opening:"", closing:"May 12", contact:"", email:"", link:"https://ca.indeed.com/viewjob?jk=98e8f3a87691b071&tk=1jnq90najg6r4800&from=serp&vjs=3", expired:true },
+
+  // CREE NATION TRIBAL HEALTH
+  { company:"Cree Nation Tribal Health", position:"Foot Care Nurse", location:"The Pas", type:"Full-time", condition:"", workMode:"", opening:"May 14", closing:"May 14", contact:"", email:"hr@tribalhealth.ca", link:"https://www.facebook.com/photo/?fbid=1489498659761982&set=gm.4437224533163367&idorvanity=2532774240275082", expired:true },
+
+  // DAIRY QUEEN
+  { company:"Dairy Queen", position:"Food Service Counter Attendant", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"In Person", opening:"Mar 14", closing:"Apr 22", contact:"", email:"dqthepas@gmail.com", link:"https://www.jobbank.gc.ca/jobsearch/jobposting/49109212?source=searchresults", expired:true },
+
+  // DOLLARAMA
+  { company:"Dollarama L.P.", position:"Store Manager", location:"The Pas", type:"Full-time", condition:"", workMode:"In Person", opening:"", closing:"", contact:"", email:"", link:"https://ca.indeed.com/jobs?q=Store+Manager+Dollarama&l=The+Pas%2C+MB", expired:false },
+
+  // GIANT TIGER
+  { company:"Giant Tiger", position:"Store Associate (JR130140)", location:"The Pas", type:"Part-time", condition:"", workMode:"In Person", opening:"", closing:"", contact:"", email:"careers@gianttiger.com", link:"https://ca.indeed.com/viewjob?jk=b01926313177d47a&tk=1jnq90najg6r4800&from=serp&vjs=3", expired:false },
+  { company:"Giant Tiger", position:"Caissier ou caissiere (JR131459)", location:"The Pas", type:"Part-time", condition:"", workMode:"In Person", opening:"", closing:"", contact:"", email:"careers@gianttiger.com", link:"https://ca.indeed.com/viewjob?jk=a462bd181e312d99&tk=1jnq90najg6r4800&from=serp&vjs=3", expired:false },
+
+  // GOVERNMENT OF MANITOBA
+  { company:"Government of Manitoba", position:"Maintenance Worker (#42778)", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"In Person", opening:"May 1", closing:"May 31", contact:"", email:"govjobs@gov.mb.ca", link:"https://www.gov.mb.ca/csc/policyman/jobboard.html", expired:false },
+  { company:"Government of Manitoba", position:"Correctional Officer (#45225)", location:"The Pas", type:"Part-time", condition:"Term", workMode:"In Person", opening:"Apr 27", closing:"May 10", contact:"", email:"correctionsrecruitment@gov.mb.ca", link:"https://www.gov.mb.ca/csc/policyman/jobboard.html", expired:true },
+  { company:"Government of Manitoba", position:"Staff Attorney (#45213)", location:"The Pas", type:"Full-time", condition:"Fixed-term", workMode:"In Person", opening:"Apr 27", closing:"May 18", contact:"", email:"govjobs@gov.mb.ca", link:"https://www.gov.mb.ca/csc/policyman/jobboard.html", expired:true },
+  { company:"Government of Manitoba", position:"Highway Construction Inspector (#44804)", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"In Person", opening:"Apr 16", closing:"May 24", contact:"", email:"govjobs@gov.mb.ca", link:"https://www.gov.mb.ca/csc/policyman/jobboard.html", expired:false },
+
+  // GREAT NORTH GM
+  { company:"Great North GM", position:"Automotive Service Technician", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"In Person", opening:"Mar 3", closing:"May 12", contact:"204-623-3481", email:"", link:"https://www.jobbank.gc.ca/jobsearch/jobposting/49035845?source=searchresults", expired:true },
+
+  // KELSEY SCHOOL DIVISION
+  { company:"Kelsey School Division", position:"French Immersion Teacher", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"In Person", opening:"", closing:"OUF", contact:"Trevor Lane", email:"carlee.stokolosa@ksd.mb.ca", link:"https://kelseyschooldivision.ca/wp-content/uploads/2025/12/French-Immersion-Permanent.pdf", expired:false },
+  { company:"Kelsey School Division", position:"Grade 9–12 Mathematics Teacher", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"In Person", opening:"", closing:"OUF", contact:"Carlee Stokolosa", email:"carlee.stokolosa@ksd.mb.ca", link:"https://kelseyschooldivision.ca/wp-content/uploads/2026/03/SBMS-Full-time-Perm-26-27-.pdf", expired:false },
+  { company:"Kelsey School Division", position:"Grade 9–12 Teacher", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"In Person", opening:"", closing:"May 5", contact:"Carlee Stokolosa", email:"carlee.stokolosa@ksd.mb.ca", link:"https://kelseyschooldivision.ca/wp-content/uploads/2026/04/Teacher-MBCI.pdf", expired:true },
+  { company:"Kelsey School Division", position:"Teaching Position (75%)", location:"The Pas", type:"Part-time", condition:"Term", workMode:"In Person", opening:"", closing:"May 5", contact:"Carlee Stokolosa", email:"carlee.stokolosa@ksd.mb.ca", link:"https://kelseyschooldivision.ca/wp-content/uploads/2026/04/75-Teacher-MBCI-ESBMS.pdf", expired:true },
+  { company:"Kelsey School Division", position:"Summer Students Wanted", location:"The Pas", type:"", condition:"Term", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr.ksd@ksd.mb.ca", link:"https://kelseyschooldivision.ca/wp-content/uploads/2026/04/Summer-Students.pdf", expired:false },
+  { company:"Kelsey School Division", position:"Education Assistant (Ecole Opasquia – Term)", location:"The Pas", type:"Part-time", condition:"Term", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr.ksd@ksd.mb.ca", link:"https://kelseyschooldivision.ca/wp-content/uploads/2026/04/EA-6.50-TERM-ECOLE-OPASQUIA-EXTERNAL.pdf", expired:false },
+  { company:"Kelsey School Division", position:"Education Assistant (MBCI – Permanent)", location:"The Pas", type:"Part-time", condition:"Permanent", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr.ksd@ksd.mb.ca", link:"https://kelseyschooldivision.ca/wp-content/uploads/2026/04/EA-6.50-PERM-MBCI-PERM-EXTERNAL.pdf", expired:false },
+  { company:"Kelsey School Division", position:"Food Prep Worker", location:"The Pas", type:"Part-time", condition:"Casual", workMode:"In Person", opening:"", closing:"OUF", contact:"Carlee Stokolosa", email:"carlee.stokolosa@ksd.mb.ca", link:"https://kelseyschooldivision.ca/wp-content/uploads/2026/03/Food-Prep-Worker-HALEY.pdf", expired:false },
+  { company:"Kelsey School Division", position:"Custodian", location:"The Pas", type:"Part-time", condition:"Permanent", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr.ksd@ksd.mb.ca", link:"https://kelseyschooldivision.ca/wp-content/uploads/2026/03/Food-Prep-Worker-HALEY.pdf", expired:false },
+  { company:"Kelsey School Division", position:"Educational Assistants – 6.50hr Term (KCS/OP)", location:"The Pas", type:"Part-time", condition:"Term", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr.ksd@ksd.mb.ca", link:"https://kelseyschooldivision.ca/wp-content/uploads/2026/03/EA-Posting-6.50-TERM-KCS-OP-HALEY.pdf", expired:false },
+  { company:"Kelsey School Division", position:"Educational Assistants – 3.25hr Permanent (EOS)", location:"The Pas", type:"Part-time", condition:"Permanent", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr.ksd@ksd.mb.ca", link:"https://kelseyschooldivision.ca/wp-content/uploads/2026/01/EA-3.25-PERM-EOS.pdf", expired:false },
+  { company:"Kelsey School Division", position:"Educational Assistant – Full-time Permanent (KCS)", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr.ksd@ksd.mb.ca", link:"https://kelseyschooldivision.ca/wp-content/uploads/2025/12/KCS-EA-PERM-.pdf-External.pdf", expired:false },
+  { company:"Kelsey School Division", position:"Educational Assistant – Term (ESBMS)", location:"The Pas", type:"Part-time", condition:"Term", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr.ksd@ksd.mb.ca", link:"https://kelseyschooldivision.ca/wp-content/uploads/2025/12/EA-6.50-TERM-ESBMS.pdfExternal.pdf", expired:false },
+  { company:"Kelsey School Division", position:"Educational Assistant – Term (MBCI)", location:"The Pas", type:"Part-time", condition:"Term", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"hr.ksd@ksd.mb.ca", link:"https://kelseyschooldivision.ca/wp-content/uploads/2025/12/EA-6.50-TERM-MBCI.pdf-External.pdf", expired:false },
+
+  // MANITOBA HARM REDUCTION NETWORK
+  { company:"Manitoba Harm Reduction Network", position:"Health Navigator", location:"The Pas", type:"Full-time", condition:"Term", workMode:"In Person", opening:"", closing:"", contact:"", email:"humanresources@mhrn.ca", link:"https://ca.indeed.com/viewjob?cmp=MANITOBA-HARM-REDUCTION-NETWORK&t=Health+Navigator&jk=39e67601fb47b726&xpse=SoCw67I3k6aM7oyRLx0LbzkdCdPP&xfps=399049a0-a67b-473e-9d21-0f04bf75e034&xkcb=SoAR67M3k6aNKdS40h0BbzkdCdPP&vjs=3", expired:false },
+
+  // MANITOBA KEEWATINOWI OKIMAKANAK
+  { company:"Manitoba Keewatinowi Okimakanak", position:"Regional Community Engagement Facilitator", location:"The Pas", type:"Full-time", condition:"Term", workMode:"", opening:"", closing:"", contact:"", email:"", link:"https://ca.indeed.com/viewjob?jk=56a941b3d570f2df&tk=1jnq91fpqgc7f801&from=serp&vjs=3", expired:false },
+
+  // MANITOULIN GROUP OF COMPANIES
+  { company:"Manitoulin Group of Companies", position:"Class 1 Night Line Haul Driver", location:"The Pas", type:"Full-time", condition:"", workMode:"In Person", opening:"", closing:"", contact:"", email:"", link:"https://ca.indeed.com/jobs?q=Class+1+Night+Line+Haul+Manitoulin&l=The+Pas%2C+MB", expired:false },
+  { company:"Manitoulin Group of Companies", position:"Class 1 City P&D", location:"The Pas", type:"Full-time", condition:"", workMode:"", opening:"", closing:"", contact:"", email:"", link:"https://ca.indeed.com/jobs?q=Class+1+City+P%26D+Manitoulin&l=The+Pas%2C+MB", expired:false },
+
+  // NEW AVENUE HOTEL
+  { company:"New Avenue Hotel", position:"Handyman", location:"The Pas", type:"", condition:"", workMode:"In Person", opening:"Apr 27", closing:"", contact:"Martin", email:"437-299-5737", link:"https://www.facebook.com/search/top?q=the%20pas%20career%20opportunities", expired:false },
+
+  // NORTHERN HEALTH REGION
+  { company:"Northern Health Region", position:"Regional Supervisor – Warehouse & Distribution", location:"The Pas", type:"", condition:"Term", workMode:"", opening:"", closing:"Feb 12-26", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Public Engagement & Indigenous Experience Coordinator", location:"The Pas", type:"", condition:"Term", workMode:"", opening:"", closing:"Jan 8", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:true },
+  { company:"Northern Health Region", position:"Home Care Scheduler", location:"The Pas", type:"", condition:"Term", workMode:"", opening:"", closing:"Feb 12-26", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Nurse Practitioner – Fischer Avenue Clinic", location:"The Pas", type:"", condition:"Term", workMode:"", opening:"", closing:"May 28-27", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Best Practice Educator – RN4 – Acute Care Inpatient Unit", location:"The Pas", type:"", condition:"Term", workMode:"", opening:"Oct 12-26", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Clinical Resource – RN3 – Obstetrics", location:"The Pas", type:"", condition:"Term", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Registered Nurse – RN2 – Emergency/SCU (multiple positions)", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Registered Nurse – RN2 – Emergency/SCU (Term – Oct 24-26)", location:"The Pas", type:"", condition:"Term", workMode:"", opening:"Oct 24-26", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Registered Nurse – RN2 – Ambulatory Care Clinic", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Registered Nurse – RN2 – Dialysis", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Registered Nurse – RN2 – Obstetrics (multiple positions)", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Registered Nurse – RN2 – Operating Room (Term)", location:"The Pas", type:"", condition:"Term", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Licensed Practical Nurse – Emergency Department", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Licensed Practical Nurse – Acute Care Inpatient Unit (multiple)", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Licensed Practical Nurse – The Pas Clinic (multiple)", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Health Care Aide – Emergency/SCU", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Health Care Aide – Acute Care Inpatient Unit (Term)", location:"The Pas", type:"", condition:"Term", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Speech Language Pathologist", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Staff Respiratory Therapist", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Clinical Dietitian", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Psychosocial Oncology Clinician", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Indigenous Elder / Knowledge Keeper", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Unit Clerk / Ward Clerk – Emergency", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Activity Worker – Psychiatric Acute Care Unit (Term – Jan 10-26)", location:"The Pas", type:"", condition:"Term", workMode:"", opening:"Jan 10-26", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Security Officer (multiple positions)", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Licensed Practical Nurse – St. Paul's Residence (multiple)", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Health Care Aide – St. Paul's Residence (multiple)", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Health Care Aide – St. Paul's Residence (Permanent Indefinite)", location:"The Pas", type:"", condition:"Permanent", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Administrative Assistant I – St. Paul's Residence", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"May 14-26", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:true },
+  { company:"Northern Health Region", position:"Unit Clerk / Ward Clerk – St. Paul's Residence", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"Jan 4-28", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Indigenous Culture Facilitator (Recreation)", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Public Health Nurse – RN4", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Home Care Attendant (Certified)", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Community Addictions Worker II", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Addiction Recovery Worker", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Cook – Home Care – Northern View Lodge", location:"The Pas", type:"", condition:"", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:false },
+  { company:"Northern Health Region", position:"Administrative Assistant I – Addictions (Term)", location:"The Pas", type:"", condition:"Term", workMode:"", opening:"", closing:"Dec 16-25", contact:"", email:"", link:"https://northernhealthregion.com/careers/current-job-opportunities/", expired:true },
+
+  // PERIMETER AVIATION
+  { company:"Perimeter Aviation", position:"Northern Station Agent", location:"The Pas", type:"Full-time", condition:"", workMode:"", opening:"", closing:"", contact:"", email:"", link:"https://ca.indeed.com/viewjob?jk=c19ac0ddda7a6c5c&tk=1jnq90najg6r4800&from=serp&vjs=3", expired:false },
+
+  // PRIMESTAFFER.CA
+  { company:"Primestaffer.ca", position:"Guard, Security", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"In Person", opening:"Apr 23", closing:"", contact:"", email:"", link:"https://www.jobbank.gc.ca/jobsearch/jobposting/49389141?source=searchresults", expired:false },
+
+  // RCMP
+  { company:"Royal Canadian Mounted Police", position:"Detachment Service Assistant (#185956-000033)", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"In Person", opening:"Apr 29", closing:"May 13", contact:"", email:"", link:"https://www.jobbank.gc.ca/jobsearch/jobposting/49418878?source=searchresults", expired:true },
+
+  // SHARED HEALTH
+  { company:"Shared Health", position:"Primary Care Paramedic", location:"The Pas", type:"", condition:"Permanent", workMode:"", opening:"", closing:"OUF", contact:"", email:"", link:"https://ca.indeed.com/viewjob?jk=edf3cdb5c0d1206a&tk=1jnq90najg6r4800&from=serp&vjs=3", expired:false },
+
+  // SHOPPERS DRUG MART
+  { company:"Shoppers Drug Mart", position:"Assistant Front Store Manager", location:"The Pas", type:"Full-time", condition:"", workMode:"In Person", opening:"", closing:"", contact:"", email:"", link:"https://ca.indeed.com/viewjob?jk=321590aed62195e2&tk=1jnq90najg6r4800&from=serp&vjs=3", expired:false },
+
+  // SWAMPY CREE TRIBAL COUNCIL
+  { company:"Swampy Cree Tribal Council", position:"Fire Safety Advisor", location:"The Pas", type:"Full-time", condition:"", workMode:"", opening:"Apr 30", closing:"OUF", contact:"Christina Gamblin", email:"cgamblin@swampycree.com", link:"https://www.facebook.com/photo/?fbid=10174549723025512&set=gm.4438245239727963&idorvanity=2532774240275082", expired:false },
+
+  // TD BANK
+  { company:"TD Bank", position:"Personal Banking Representative", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"", opening:"", closing:"", contact:"", email:"", link:"https://www.jobbank.gc.ca/jobsearch/jobsearch?searchstring=personal+banking+representative&locationstring=The+Pas%2C+MB", expired:false },
+  { company:"TD Bank", position:"Personal Banking Associate", location:"The Pas", type:"Full-time", condition:"", workMode:"", opening:"", closing:"", contact:"", email:"", link:"https://ca.indeed.com/viewjob?jk=0d3da1e8d5406858&tk=1jnq5uo72gkvb801&from=serp&vjs=3", expired:false },
+
+  // TIM HORTONS
+  { company:"Tim Hortons", position:"Food Counter Attendant", location:"Opaskwayak", type:"Full-time", condition:"Permanent", workMode:"In Person", opening:"Apr 25", closing:"May 16", contact:"", email:"timhortonsopask@gmail.com", link:"https://www.jobbank.gc.ca/jobsearch/jobposting/49398320?source=searchresults", expired:true },
+
+  // THE PAS ACTION CENTRE
+  { company:"The Pas Action Centre", position:"Student Positions", location:"The Pas", type:"Part-time", condition:"", workMode:"In Person", opening:"Apr 20", closing:"", contact:"", email:"tpac@mymts.net", link:"https://www.facebook.com/search/top?q=the%20pas%20career%20opportunities", expired:false },
+
+  // THE PAS CHAMBER OF COMMERCE
+  { company:"The Pas Chamber of Commerce", position:"Office Assistant – Summer Student", location:"The Pas", type:"Full-time", condition:"", workMode:"", opening:"Apr 27", closing:"", contact:"", email:"contact@thepasocnchamber.ca", link:"", expired:false },
+
+  // THE PAS COLLISION AND GLASS
+  { company:"The Pas Collision and Glass", position:"Auto Body Reparier", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"In Person", opening:"Jan 29", closing:"Apr 21", contact:"", email:"hr@h5group.ca", link:"https://www.jobbank.gc.ca/jobsearch/jobposting/48612032?source=searchresults", expired:true },
+
+  // THE PAS CORRECTIONAL CENTER
+  { company:"The Pas Correctional Center", position:"Correctional Officer", location:"The Pas", type:"Part-time", condition:"Permanent", workMode:"In Person", opening:"May 1", closing:"", contact:"Karen Ballantyne", email:"TPCC.Hiring@gov.mb.ca", link:"https://www.facebook.com/search/top?q=the%20pas%20career%20opportunities", expired:false },
+
+  // THE PAS IMMIGRATION SERVICES
+  { company:"The Pas Immigration Services", position:"Youth Worker – Summer Day Camps", location:"The Pas", type:"Full-time", condition:"Term", workMode:"In Person", opening:"", closing:"", contact:"", email:"infothepas@nwris.ca", link:"https://www.facebook.com/search/top?q=the%20pas%20career%20opportunities", expired:false },
+  { company:"The Pas Immigration Services", position:"Supervisor – Summer Youth Engagement Program", location:"The Pas", type:"Full-time", condition:"Term", workMode:"In Person", opening:"", closing:"", contact:"", email:"infothepas@nwris.ca", link:"https://www.facebook.com/search/top?q=the%20pas%20career%20opportunities", expired:false },
+
+  // TOWN OF THE PAS
+  { company:"Town of The Pas", position:"Recycling Center General Labourer", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"tricomrecycling@gmail.com", link:"https://townofthepas.ca/employment-opportunities", expired:false },
+  { company:"Town of The Pas", position:"Assistant Museum Coordinator", location:"The Pas", type:"Full-time", condition:"Term", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"", link:"https://townofthepas.ca/employment-opportunities", expired:false },
+  { company:"Town of The Pas", position:"Curatorial Assistant", location:"The Pas", type:"Full-time", condition:"Term", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"", link:"https://townofthepas.ca/employment-opportunities", expired:false },
+  { company:"Town of The Pas", position:"Lifeguard", location:"The Pas", type:"Full-time", condition:"Fixed-term", workMode:"In Person", opening:"", closing:"OUF", contact:"", email:"", link:"https://townofthepas.ca/employment-opportunities", expired:false },
+
+  // TURNING LEAF SUPPORT SERVICES
+  { company:"Turning Leaf Support Services", position:"Direct Support Professional", location:"The Pas", type:"FT/PT", condition:"Permanent", workMode:"In Person", opening:"", closing:"", contact:"", email:"careersmb@tlservices.ca", link:"https://ca.indeed.com/jobs?q=Direct+Support+Professional+Turning+Leaf&l=The+Pas%2C+MB", expired:false },
+
+  // TWIN MOTORS
+  { company:"Twin Motors", position:"Assistant Lot Manager", location:"The Pas", type:"Full-time", condition:"", workMode:"In Person", opening:"", closing:"", contact:"", email:"hr@h5group.ca", link:"https://ca.indeed.com/viewjob?jk=3ace9799deb0b3a9&tk=1jm3l6t28gpqg865&from=serp&vjs=3", expired:false },
+
+  // UNIVERSITY COLLEGE OF THE NORTH
+  { company:"University College of the North", position:"Purchasing Agent (#26-018)", location:"The Pas", type:"Full-time", condition:"Term", workMode:"", opening:"", closing:"Mar 5", contact:"", email:"hrinfo@ucn.ca", link:"https://soar.ucn.ca/ICS/icsfs/26-018_Purchasing_Agent_FT_Term_TP_REVISED.pdf", expired:true },
+  { company:"University College of the North", position:"Primary Care Paramedic Instructor (#26-029)", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"", opening:"", closing:"Feb 23", contact:"", email:"hrinfo@ucn.ca", link:"https://soar.ucn.ca/ICS/icsfs/26-029_PCP_Instructor_FT_Perm_TP.pdf?target=1a234542-19b6-4ac3-b2bc-bd52f4ad01cc", expired:true },
+  { company:"University College of the North", position:"Primary Care Paramedic Instructor (#26-012)", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"", opening:"", closing:"Feb 10", contact:"", email:"hrinfo@ucn.ca", link:"https://soar.ucn.ca/ICS/icsfs/26-012_PCP_Instructor_Term_TP_EXTENDED.pdf?target=377aae0f-6f38-4e73-8df7-1d3a36524739", expired:true },
+  { company:"University College of the North", position:"Bachelor of Nursing Instructor (#26-038)", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"", opening:"", closing:"Apr 22", contact:"", email:"hrinfo@ucn.ca", link:"https://soar.ucn.ca/ICS/icsfs/26-038_BN_Instructor_FT_Perm_TP_-_EXTENDED.pdf?target=20cc5f1d-e9b0-4fc1-9544-5e10a2d09cae", expired:true },
+  { company:"University College of the North", position:"Bachelor of Nursing Instructor (#26-047)", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"", opening:"", closing:"Apr 20", contact:"", email:"hrinfo@ucn.ca", link:"https://soar.ucn.ca/ICS/icsfs/26-047_BN_Instructor_FT_Perm_TP_.pdf?target=efbb9992-fe42-4250-8443-edab8f8c8b8d", expired:true },
+  { company:"University College of the North", position:"Library Technician (#26-037)", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"", opening:"", closing:"Apr 30", contact:"", email:"hrinfo@ucn.ca", link:"https://soar.ucn.ca/ICS/icsfs/26-037_Library_Technician_FT_Perm_TP_EXTENDED.pdf?target=c82da194-8891-40dc-a69e-ab93302ed434", expired:true },
+  { company:"University College of the North", position:"Bachelor of Nursing Instructor (#26-045)", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"", opening:"", closing:"Apr 20", contact:"", email:"hrinfo@ucn.ca", link:"https://soar.ucn.ca/ICS/icsfs/26-045_BN_Instructor_FT_Perm_TP_TH.pdf?target=d1c885ea-3127-4fe0-8182-134e23ad4472", expired:true },
+  { company:"University College of the North", position:"Accounting Clerk (#26-039)", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"", opening:"", closing:"Apr 9", contact:"", email:"hrinfo@ucn.ca", link:"https://soar.ucn.ca/ICS/icsfs/26-039_Accounting_Clerk_FT_Perm_TP.pdf?target=ff6f63de-4653-477d-8969-fc35b021e26c", expired:true },
+  { company:"University College of the North", position:"Administrative Assistant (#26-052)", location:"The Pas", type:"Full-time", condition:"", workMode:"", opening:"", closing:"May 12", contact:"", email:"hrinfo@ucn.ca", link:"https://soar.ucn.ca/ICS/icsfs/26-052_Administrative_Assistant_Ininimowin_FT_Perm.pdf?target=dd9a5db6-e746-45f9-9fae-516a30b68b98", expired:true },
+  { company:"University College of the North", position:"Report Developer (#26-022)", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"", opening:"", closing:"May 13", contact:"", email:"hrinfo@ucn.ca", link:"https://soar.ucn.ca/ICS/icsfs/26-022_Report_Developer_FT_Perm_TP_TH_Remote_EXTEN.pdf?target=cdc328eb-001f-4e89-99ea-b72419900b57", expired:true },
+  { company:"University College of the North", position:"Enrolement Services Advisor (#26-028)", location:"The Pas", type:"Full-time", condition:"Permanent", workMode:"", opening:"", closing:"May 11", contact:"", email:"hrinfo@ucn.ca", link:"https://soar.ucn.ca/ICS/icsfs/26-028_Enrolment_Service_Advisor_FT_Perm_TP_REVISE.pdf?target=a02553c6-cff5-4139-bf97-443aefec0fa0", expired:true },
+];
+
+// ─── RENDER ────────────────────────────────────────────────────────────────────
+
+function typeTag(type) {
+  if (!type) return '';
+  if (type === 'Full-time') return `<span class="tag tag-ft">FT</span>`;
+  if (type === 'Part-time') return `<span class="tag tag-pt">PT</span>`;
+  if (type === 'FT/PT') return `<span class="tag tag-ftpt">FT/PT</span>`;
+  return `<span class="tag">${type}</span>`;
+}
+
+function conditionTag(cond) {
+  if (!cond) return '';
+  if (cond === 'Permanent') return `<span class="tag tag-perm">Perm</span>`;
+  if (cond === 'Term') return `<span class="tag tag-term">Term</span>`;
+  if (cond === 'Casual') return `<span class="tag tag-casual">Casual</span>`;
+  if (cond === 'Fixed-term') return `<span class="tag tag-term">Fixed-term</span>`;
+  return `<span class="tag">${cond}</span>`;
+}
+
+function closingDisplay(closing, expired) {
+  if (!closing) return '<span style="color:#aab">—</span>';
+  if (closing === 'OUF') return `<span class="tag tag-ouf">OUF</span>`;
+  if (expired) return `<span class="tag tag-exp">${closing} &#9679; Expired</span>`;
+  return closing;
+}
+
+function renderRows(data) {
+  const tbody = document.getElementById('jobBody');
+  if (!data.length) {
+    tbody.innerHTML = '';
+    document.getElementById('noResults').style.display = 'block';
+    document.getElementById('jobTable').style.display = 'none';
+    document.getElementById('visibleCount').textContent = '0';
+    return;
+  }
+  document.getElementById('noResults').style.display = 'none';
+  document.getElementById('jobTable').style.display = '';
+
+  tbody.innerHTML = data.map(j => {
+    const contactParts = [];
+    if (j.contact) contactParts.push(j.contact);
+    if (j.email) {
+      // check if it's a phone number (digits and dashes)
+      if (/^[\d\-\+\s\(\)]+$/.test(j.email)) {
+        contactParts.push(`<a href="tel:${j.email.replace(/\s/g,'')}">${j.email}</a>`);
+      } else {
+        contactParts.push(`<a href="mailto:${j.email}">${j.email}</a>`);
+      }
+    }
+    const contactHTML = contactParts.length ? contactParts.join('<br>') : '<span style="color:#aab">—</span>';
+
+    const linkHTML = j.link
+      ? `<a class="apply-btn" href="${j.link}" target="_blank" rel="noopener noreferrer">View Posting</a>`
+      : `<span class="apply-btn no-link">No Link</span>`;
+
+    return `<tr class="${j.expired ? 'expired' : ''}">
+      <td class="company">${j.company}</td>
+      <td class="position">${j.position}</td>
+      <td class="location">${j.location}</td>
+      <td>${typeTag(j.type)}</td>
+      <td>${conditionTag(j.condition)}</td>
+      <td class="dates">${j.opening || '<span style="color:#aab">—</span>'}</td>
+      <td class="dates">${closingDisplay(j.closing, j.expired)}</td>
+      <td class="contact-cell">${contactHTML}</td>
+      <td>${linkHTML}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('visibleCount').textContent = data.length;
+}
+
+// ─── FILTER ────────────────────────────────────────────────────────────────────
+
+let sortCol = -1;
+let sortDir = 1;
+
+function applyFilters() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const loc = document.getElementById('filterLocation').value;
+  const type = document.getElementById('filterType').value;
+  const cond = document.getElementById('filterCondition').value;
+  const status = document.getElementById('filterStatus').value;
+
+  let data = jobs.filter(j => {
+    if (q && !(`${j.company} ${j.position} ${j.location} ${j.type} ${j.condition}`).toLowerCase().includes(q)) return false;
+    if (loc && j.location !== loc) return false;
+    if (type && j.type !== type) return false;
+    if (cond && j.condition !== cond) return false;
+    if (status === 'open' && j.expired) return false;
+    if (status === 'expired' && !j.expired) return false;
+    return true;
+  });
+
+  if (sortCol >= 0) {
+    const keys = ['company','position','location','type','condition','opening','closing'];
+    data = [...data].sort((a, b) => {
+      const va = (a[keys[sortCol]] || '').toLowerCase();
+      const vb = (b[keys[sortCol]] || '').toLowerCase();
+      return va < vb ? -sortDir : va > vb ? sortDir : 0;
+    });
+  }
+
+  renderRows(data);
+}
+
+function resetFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('filterLocation').value = '';
+  document.getElementById('filterType').value = '';
+  document.getElementById('filterCondition').value = '';
+  document.getElementById('filterStatus').value = '';
+  sortCol = -1;
+  sortDir = 1;
+  document.querySelectorAll('thead th').forEach(th => th.classList.remove('sort-asc','sort-desc'));
+  applyFilters();
+}
+
+function sortTable(col) {
+  if (sortCol === col) {
+    sortDir *= -1;
+  } else {
+    sortCol = col;
+    sortDir = 1;
+  }
+  document.querySelectorAll('thead th').forEach((th, i) => {
+    th.classList.remove('sort-asc','sort-desc');
+    if (i === col) th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+  });
+  applyFilters();
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────────
+document.getElementById('totalCount').textContent = jobs.length;
+applyFilters();
+</script>
+</body>
+</html>
